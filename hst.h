@@ -44,10 +44,12 @@ std::string run_history(Func f) {
 //  tester: Helper to run tests and report pass/fail, then print a summary
 
 class tester {
-    std::string report;
+    std::string name, report;
     int         tests = 0, passed = 0;
 
 public:
+    tester(std::string name_) : name{name_} { }
+ 
     //  Execute a test, and compare its history to the expected history.
     template<typename Func>
     void run(const std::string& name, Func f, const std::string& expected) {
@@ -84,10 +86,12 @@ public:
     }
 
     std::string summary() {
-        return  "\nTest summary:"
-                "\n  total:  " + std::to_string(tests) +
+        return  std::string(75, '=') + 
+                "\n" + name + 
+                "\n\n  total:  " + std::to_string(tests) +
                 "\n  passed: " + std::to_string(passed) +
                 "\n  failed: " + std::to_string(tests-passed) +
+                "\n" + std::string(75, '-') +
                 "\n\n" + report;
     }
 };
