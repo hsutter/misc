@@ -45,7 +45,7 @@ std::string run_history(Func f) {
 
 class tester {
     std::string name, report;
-    int         tests = 0, passed = 0;
+    int         total = 0, passed = 0;
 
 public:
     tester(std::string name_) : name{name_} { }
@@ -53,7 +53,7 @@ public:
     //  Execute a test, and compare its history to the expected history.
     template<typename Func>
     void run(const std::string& name, Func f, const std::string& expected) {
-        ++tests;
+        ++total;
         auto actual = run_history(f);
 
         std::string diff;
@@ -65,7 +65,7 @@ public:
             diff.push_back(' ');
         }
 
-        report += std::to_string(tests) + ": " + name + "... ";
+        report += std::to_string(total) + ": " + name + "... ";
         if (expected == actual) {
             ++passed;
             report += "passed";
@@ -88,9 +88,9 @@ public:
     std::string summary() {
         return  std::string(75, '=') + 
                 "\n" + name + 
-                "\n\n  total:  " + std::to_string(tests) +
+                "\n\n  total:  " + std::to_string(total) +
                 "\n  passed: " + std::to_string(passed) +
-                "\n  failed: " + std::to_string(tests-passed) +
+                "\n  failed: " + std::to_string(total-passed) +
                 "\n" + std::string(75, '-') +
                 "\n\n" + report;
     }
