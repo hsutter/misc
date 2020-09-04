@@ -90,7 +90,9 @@ public:
                 "\n" + name + 
                 "\n\n  total:  " + std::to_string(total) +
                 "\n  passed: " + std::to_string(passed) +
+                "\t" + std::string(passed, 'o') +
                 "\n  failed: " + std::to_string(total-passed) +
+                "\t" + std::string(total-passed, 'x') +
                 "\n" + std::string(75, '-') +
                 "\n\n" + report;
     }
