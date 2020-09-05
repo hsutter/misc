@@ -44,7 +44,7 @@ std::string run_history(Func f) {
 //  tester: Helper to run tests and report pass/fail, then print a summary
 
 class tester {
-    std::string name, report;
+    std::string name, passfail, report;
     int         total = 0, passed = 0;
 
 public:
@@ -68,8 +68,10 @@ public:
         report += std::to_string(total) + ": " + name + "... ";
         if (expected == actual) {
             ++passed;
+            passfail += '.';
             report += "passed";
         } else {
+            passfail += 'x';
             report += "\n    expected: \"" + expected + 
                     "\"\n    actual:   \"" + actual + 
                     "\"\n               "  + diff;
@@ -89,10 +91,9 @@ public:
         return  std::string(75, '=') + 
                 "\n" + name + 
                 "\n\n  total:  " + std::to_string(total) +
+                "\t" + passfail +
                 "\n  passed: " + std::to_string(passed) +
-                "\t" + std::string(passed, 'o') +
                 "\n  failed: " + std::to_string(total-passed) +
-                "\t" + std::string(total-passed, 'x') +
                 "\n" + std::string(75, '-') +
                 "\n\n" + report;
     }
