@@ -44,15 +44,34 @@ std::string run_history(Func f) {
 
 //------------------------------------------------------------------------------
 //  can_invoke: Tests whether a call of F(args) will be ambiguous or not.
-//              Derived from code provided by Dr. Walter E. Brown, with thanks
-template<typename Func, Func* F, typename... Args >
-void can_invoke( Args &&... args ) {
+//              Derived from code provided by Dr. Walter E. Brown, with thanks.
+//
+//  First, a simple version that doesn't work with overload sets.
+template<typename Func, Func* F, typename ...Args >
+void can_invoke (Args&&... args) {
     if constexpr( requires { F( static_cast<decltype(args)>(args)... ); } )
         history += "can-invoke ";
     else
         history += "cannot-invoke ";
 }
 #define HST_CAN_INVOKE(F) can_invoke<decltype(F), &(F)>
+
+//  Second, one that can work with overload sets, but for each function
+//  "myfunc" that you want to test you need to write this at global scope:
+//      HST_CAN_INVOKE_OVERLOADED(myfunc)
+//  and then you can write the test as
+//      hst::can_invoke_overloaded_myfunc(params)
+//  to query whether calling "myfunc(params)" is legal and unambiguous.
+#define HST_CAN_INVOKE_OVERLOADED(F) \
+    namespace hst { \
+    template<typename ...Args > \
+    bool hst_can_invoke_overloaded_##F (Args&&... args) { \
+        if constexpr( requires { F( static_cast<decltype(args)>(args)... ); } ) \
+            return true; \
+        else \
+            return false; \
+        } \
+    }
 
 
 //------------------------------------------------------------------------------
