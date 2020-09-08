@@ -9,6 +9,9 @@ Not recommended for real use.
 
 ------------------------------------------------------------------------------*/
 
+#ifndef HST_DEFINED
+#define HST_DEFINED
+
 #include <string>
 #include <type_traits>
 
@@ -38,6 +41,18 @@ std::string run_history(Func f) {
     f();
     return history;
 }
+
+//------------------------------------------------------------------------------
+//  can_invoke: Tests whether a call of F(args) will be ambiguous or not.
+//              Derived from code provided by Dr. Walter E. Brown, with thanks
+template<typename Func, Func* F, typename... Args >
+void can_invoke( Args &&... args ) {
+    if constexpr( requires { F( static_cast<decltype(args)>(args)... ); } )
+        history += "can-invoke ";
+    else
+        history += "cannot-invoke ";
+}
+#define HST_CAN_INVOKE(F) can_invoke<decltype(F), &(F)>
 
 
 //------------------------------------------------------------------------------
@@ -100,3 +115,5 @@ public:
 };
 
 }
+
+#endif
