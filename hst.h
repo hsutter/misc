@@ -26,11 +26,11 @@ template<class T>
 class noisy {
 public:
     T t;
-    noisy()                                  { history += "default-ctor "; };
+    noisy()                                  { history += "default-ctor "; }
     noisy(const noisy& rhs) : t{rhs.t}       { history += "copy-ctor "; }
     noisy(noisy&& rhs) : t{std::move(rhs.t)} { history += "move-ctor "; }
-    void operator=(const noisy& rhs)         { t = rhs.t; history += "copy-assign "; }
-    void operator=(noisy&& rhs)              { t = std::move(rhs.t); history += "move-assign "; }
+    void operator=(const noisy& rhs)         { history += "copy-assign ";  t = rhs.t;             return *this; }
+    void operator=(noisy&& rhs)              { history += "move-assign ";  t = std::move(rhs.t);  return *this; }
     ~noisy()                                 { history += "dtor "; }
 };
 
@@ -65,11 +65,11 @@ void can_invoke (Args&&... args) {
 #define HST_CAN_INVOKE_OVERLOADED(F) \
     namespace hst { \
     template<typename ...Args > \
-    bool hst_can_invoke_overloaded_##F (Args&&... args) { \
+    void hst_can_invoke_overloaded_##F (Args&&... args) { \
         if constexpr( requires { F( static_cast<decltype(args)>(args)... ); } ) \
-            return true; \
+            history += "can-invoke "; \
         else \
-            return false; \
+            history += "cannot-invoke "; \
         } \
     }
 
