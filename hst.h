@@ -18,29 +18,24 @@ Not recommended for real use.
 namespace hst {
 
 //------------------------------------------------------------------------------
-//  noisy<T>: A little helper to conveniently instrument T's SMF history
-
-std::string history;
-
-template<class T>
-class noisy {
-public:
-    T t;
-    noisy()                                  { history += "default-ctor "; }
-    noisy(const noisy& rhs) : t{rhs.t}       { history += "copy-ctor "; }
-    noisy(noisy&& rhs) : t{std::move(rhs.t)} { history += "move-ctor "; }
-    void operator=(const noisy& rhs)         { history += "copy-assign ";  t = rhs.t;             return *this; }
-    void operator=(noisy&& rhs)              { history += "move-assign ";  t = std::move(rhs.t);  return *this; }
-    ~noisy()                                 { history += "dtor "; }
-};
+//  Instrumentation to inspect SMF call history
 
 //  run_history: Run some code and return the history it generated
-template<typename Func>
-std::string run_history(Func f) {
-    history = {};
-    f();
-    return history;
-}
+std::string history;
+auto run_history(auto f) { history = {};  f();  return history;  }
+
+//  noisy<T>: A little helper to conveniently instrument T's SMF history
+template<typename T>
+struct noisy {
+    T t;
+    noisy()                                  { history += "default-ctor "; }
+    ~noisy()                                 { history += "dtor "; }
+    noisy(const noisy& rhs) : t{rhs.t}       { history += "copy-ctor "; }
+    noisy(noisy&& rhs) : t{std::move(rhs.t)} { history += "move-ctor "; }
+    auto operator=(const noisy& rhs)         { history += "copy-assign ";  t = rhs.t; return *this; }
+    auto operator=(noisy&& rhs)              { history += "move-assign ";  t = std::move(rhs.t); return *this; }
+};
+
 
 //------------------------------------------------------------------------------
 //  can_invoke: Tests whether a call of F(args) will be ambiguous or not.
