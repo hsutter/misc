@@ -32,8 +32,8 @@ struct noisy {
     ~noisy()                                 { history += "dtor "; }
     noisy(const noisy& rhs) : t{rhs.t}       { history += "copy-ctor "; }
     noisy(noisy&& rhs) : t{std::move(rhs.t)} { history += "move-ctor "; }
-    auto operator=(const noisy& rhs)         { history += "copy-assign ";  t = rhs.t; return *this; }
-    auto operator=(noisy&& rhs)              { history += "move-assign ";  t = std::move(rhs.t); return *this; }
+    auto& operator=(const noisy& rhs)        { history += "copy-assign ";  t = rhs.t; return *this; }
+    auto& operator=(noisy&& rhs)             { history += "move-assign ";  t = std::move(rhs.t); return *this; }
 };
 
 
