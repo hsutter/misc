@@ -26,14 +26,14 @@ auto run_history(auto f) { history = {};  f();  return history;  }
 
 //  noisy<T>: A little helper to conveniently instrument T's SMF history
 template<typename T>
-struct noisy {
-    T t;
-    noisy()                                  { history += "default-ctor "; }
-    ~noisy()                                 { history += "dtor "; }
-    noisy(const noisy& rhs) : t{rhs.t}       { history += "copy-ctor "; }
-    noisy(noisy&& rhs) : t{std::move(rhs.t)} { history += "move-ctor "; }
-    auto& operator=(const noisy& rhs)        { history += "copy-assign ";  t = rhs.t; return *this; }
-    auto& operator=(noisy&& rhs)             { history += "move-assign ";  t = std::move(rhs.t); return *this; }
+struct noisy : T {
+    noisy()                                { history += "default-ctor "; }
+    noisy(auto&&... xs)                    : T{std::forward<decltype(xs)>(xs)...} { history += "custom-ctor "; }
+    ~noisy()                               { history += "dtor "; }
+    noisy(const noisy& rhs) : T{rhs}       { history += "copy-ctor "; }
+    noisy(noisy&& rhs) : T{std::move(rhs)} { history += "move-ctor "; }
+    auto& operator=(const noisy& rhs)      { history += "copy-assign ";  T::operator=(rhs); return *this; }
+    auto& operator=(noisy&& rhs)           { history += "move-assign ";  T::operator=(std::move(rhs)); return *this; }
 };
 
 
